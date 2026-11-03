@@ -1,8 +1,17 @@
 package parlia
 
 import (
+	"errors"
+	"fmt"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/consensus"
+	"github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core/systemcontracts"
+	"github.com/ethereum/go-ethereum/core/tracing"
+	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/vm"
 	"github.com/ethereum/go-ethereum/params"
 	"github.com/holiman/uint256"
 )
@@ -124,4 +133,26 @@ func (curve *pulseRewardCurve) rewardForInterval(genesisTime, parentTime, blockT
 		return reserveBalance.ToBig()
 	}
 	return reward
+}
+
+func (p *Parlia) distributePulseBlockReward(chain consensus.ChainHeaderReader, parent *types.Header, state vm.StateDB, header *types.Header, cx core.ChainContext, txs *[]*types.Transaction, receipts *[]*types.Receipt, receivedTxs *[]*types.Transaction, usedGas *uint64, mode systemTxMode, tracer *tracing.Hooks) error {
+	if p.chainConfig.ChainID == nil || p.chainConfig.ChainID.Uint64() != params.PulseChainID {
+		return nil
+	}
+	genesis := chain.GetHeaderByNumber(0)
+	if genesis == nil {
+		return errors.New("PULSE genesis header not found for block reward calculation")
+	}
+	reserveAddress := common.HexToAddress(systemcontracts.PulseBlockRewardReserve)
+	reserveBalance := state.GetBalance(reserveAddress)
+	blockReward := pulseEmissionCurve.rewardForInterval(genesis.Time, parent.Time, header.Time, reserveBalance)
+	if blockReward.Sign() == 0 {
+		return nil
+	}
+	rewardValue := uint256.MustFromBig(blockReward)
+	state.SetBalance(reserveAddress, new(uint256.Int).Sub(reserveBalance, rewardValue), tracing.BalanceChangeUnspecified)
+	if err := p.distributeToValidator(blockReward, header.Coinbase, state, header, cx, txs, receipts, receivedTxs, usedGas, mode, tracer); err != nil {
+		return fmt.Errorf("distribute PULSE block reward: %w", err)
+	}
+	return nil
 }
