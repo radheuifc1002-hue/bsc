@@ -1495,24 +1495,8 @@ func (p *Parlia) Finalize(chain consensus.ChainHeaderReader, header *types.Heade
 		}
 	}
 
-	// PULSE's 128-year block-reward emission is funded only by its
-	// genesis-reserved balance and deposited through the existing validator
-	// reward contract. Other BSC-derived networks retain upstream behavior.
-	if p.chainConfig.ChainID != nil && p.chainConfig.ChainID.Uint64() == params.PulseChainID {
-		genesis := chain.GetHeaderByNumber(0)
-		if genesis == nil {
-			return errors.New("PULSE genesis header not found for block reward calculation")
-		}
-		reserveAddress := common.HexToAddress(systemcontracts.PulseBlockRewardReserve)
-		reserveBalance := state.GetBalance(reserveAddress)
-		blockReward := pulseEmissionCurve.rewardForInterval(genesis.Time, parent.Time, header.Time, reserveBalance)
-		if blockReward.Sign() > 0 {
-			rewardValue := uint256.MustFromBig(blockReward)
-			state.SetBalance(reserveAddress, new(uint256.Int).Sub(reserveBalance, rewardValue), tracing.BalanceChangeUnspecified)
-			if err := p.distributeToValidator(blockReward, header.Coinbase, state, header, cx, txs, receipts, systemTxs, usedGas, systemTxImporting, tracer); err != nil {
-				return fmt.Errorf("distribute PULSE block reward: %w", err)
-			}
-		}
+	if err := p.distributePulseBlockReward(chain, parent, state, header, cx, txs, receipts, systemTxs, usedGas, systemTxImporting, tracer); err != nil {
+		return err
 	}
 
 	val := header.Coinbase
@@ -1595,6 +1579,9 @@ func (p *Parlia) finalizeAndAssemble(chain consensus.ChainHeaderReader, header *
 		if err != nil {
 			return nil, nil, errors.New("init contract failed")
 		}
+	}
+	if err := p.distributePulseBlockReward(chain, parent, state, header, cx, &body.Transactions, &receipts, nil, &header.GasUsed, mode, tracer); err != nil {
+		return nil, nil, err
 	}
 	if header.Difficulty.Cmp(diffInTurn) != 0 {
 		number := header.Number.Uint64()
