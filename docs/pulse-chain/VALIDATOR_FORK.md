@@ -9,7 +9,7 @@ currently defines these initialization values:
 
 | StakeHub parameter | Upstream default |
 |---|---:|
-| `minSelfDelegationBNB` | 2,000 BNB |
+| `minSelfDelegationBNB` | 2,000 BNB (upstream default) |
 | `minDelegationBNBChange` | 1 BNB |
 | `maxElectedValidators` | 45 |
 | `unbondPeriod` | 7 days |
@@ -18,7 +18,7 @@ currently defines these initialization values:
 Its governance parameter update path also constrains
 `minSelfDelegationBNB` to a range of 1,000–100,000 BNB. Therefore changing
 only the initialization default is not sufficient for PULSE CHAIN's requested
-2,000,000 PULSE minimum: the governance validation bound must also be reviewed
+1,000,000 PULSE minimum: the governance validation bound must also be reviewed
 and updated, otherwise the intended value cannot be set through that path.
 
 Source reference: https://github.com/bnb-chain/bsc-genesis-contract/blob/master/contracts/StakeHub.sol
@@ -26,7 +26,7 @@ Source reference: https://github.com/bnb-chain/bsc-genesis-contract/blob/master/
 ## PULSE CHAIN requirement
 
 - Set the minimum self-delegation/validator eligibility threshold to
-  2,000,000 PULSE (18-decimal base units in the EVM contract).
+  1,000,000 PULSE (18-decimal base units in the EVM contract).
 - Keep the elected-validator capacity at the upstream value of 45.
 - Preserve the remaining upstream staking and validator behavior unless a
   separate, explicitly approved change requires otherwise.
@@ -40,7 +40,7 @@ Source reference: https://github.com/bnb-chain/bsc-genesis-contract/blob/master/
    the selected BSC source revision.
 2. Vendor or fork the exact Solidity source and its build configuration with
    license notices intact.
-3. Change the minimum self-delegation default to 2,000,000 PULSE and update the
+3. Change the minimum self-delegation default to 1,000,000 PULSE and update the
    governance parameter validation range so it accepts the intended value.
 4. Preserve the 45 elected-validator capacity and all unrelated parameters.
 5. Rebuild the affected system-contract bytecode using the pinned compiler and
