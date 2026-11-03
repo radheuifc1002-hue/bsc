@@ -21,9 +21,9 @@ import (
 // change across protocol forks or blocks are delayed.
 const (
 	pulseRewardYears                 = uint64(128)
-	pulseRewardYearSeconds           = uint64(31_557_600) // Julian year: 365.25 days
-	pulseRewardSixMonthSeconds       = pulseRewardYearSeconds / 2
-	pulseRewardDurationSeconds       = pulseRewardYears * pulseRewardYearSeconds
+	pulseRewardYearMilliseconds      = uint64(31_557_600_000) // Julian year: 365.25 days
+	pulseRewardSixMonthMilliseconds  = pulseRewardYearMilliseconds / 2
+	pulseRewardDurationMilliseconds  = pulseRewardYears * pulseRewardYearMilliseconds
 	pulseRewardPeriods               = int(pulseRewardYears * 2)
 	pulseRewardReserveWholePULSE     = int64(110_000_000)
 	pulseRewardLinearDropNumerator   = int64(1)
@@ -48,7 +48,7 @@ func newPulseRewardCurve() *pulseRewardCurve {
 		cumulative:   make([]*big.Int, pulseRewardPeriods+1),
 		totalWeight:  new(big.Int),
 		reserveWei:   new(big.Int).Mul(big.NewInt(pulseRewardReserveWholePULSE), new(big.Int).SetUint64(params.Ether)),
-		periodLength: new(big.Int).SetUint64(pulseRewardSixMonthSeconds),
+		periodLength: new(big.Int).SetUint64(pulseRewardSixMonthMilliseconds),
 	}
 	curve.powers[0] = scale
 	curve.cumulative[0] = new(big.Int)
@@ -70,10 +70,10 @@ func newPulseRewardCurve() *pulseRewardCurve {
 }
 
 // weightAt returns the integrated, fixed-point emission weight from genesis
-// through elapsedSeconds. Each six-month segment is linear internally and
+// through elapsedMilliseconds. Each six-month segment is linear internally and
 // starts 5% below the previous segment's starting rate.
 func (curve *pulseRewardCurve) weightAt(elapsedSeconds uint64) *big.Int {
-	if elapsedSeconds >= pulseRewardDurationSeconds {
+	if elapsedSeconds >= pulseRewardDurationMilliseconds {
 		return new(big.Int).Set(curve.totalWeight)
 	}
 	period := int(elapsedSeconds / pulseRewardSixMonthSeconds)
@@ -97,7 +97,7 @@ func (curve *pulseRewardCurve) weightAt(elapsedSeconds uint64) *big.Int {
 }
 
 // rewardForInterval returns the reserve-funded reward attributable to the
-// timestamp interval (parentTime, blockTime]. Cumulative targets make rewards
+// millisecond timestamp interval (parentTime, blockTime]. Cumulative targets make rewards
 // independent of block count and prevent timestamp gaps from losing emissions.
 func (curve *pulseRewardCurve) rewardForInterval(genesisTime, parentTime, blockTime uint64, reserveBalance *uint256.Int) *big.Int {
 	if blockTime <= genesisTime || blockTime <= parentTime || reserveBalance == nil || reserveBalance.IsZero() {
@@ -145,7 +145,7 @@ func (p *Parlia) distributePulseBlockReward(chain consensus.ChainHeaderReader, p
 	}
 	reserveAddress := common.HexToAddress(systemcontracts.PulseBlockRewardReserve)
 	reserveBalance := state.GetBalance(reserveAddress)
-	blockReward := pulseEmissionCurve.rewardForInterval(genesis.Time, parent.Time, header.Time, reserveBalance)
+	blockReward := pulseEmissionCurve.rewardForInterval(genesis.MilliTimestamp(), parent.MilliTimestamp(), header.MilliTimestamp(), reserveBalance)
 	if blockReward.Sign() == 0 {
 		return nil
 	}
