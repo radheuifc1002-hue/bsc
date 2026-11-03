@@ -8,6 +8,7 @@ interface Vm {
     function startPrank(address sender) external;
     function stopPrank() external;
     function expectRevert() external;
+    function expectRevert(bytes4 revertData) external;
 }
 
 contract StakeHubLimitHarness is StakeHub {
