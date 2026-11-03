@@ -358,7 +358,7 @@ contract StakeHub is SystemV2, Initializable, Protectable {
 
         uint256 delegation = msg.value - LOCK_AMOUNT; // create validator need to lock 1 native token
         if (delegation < minSelfDelegationBNB) revert SelfDelegationNotEnough();
-        if (delegation > MAX_SELF_DELEGATION_PULSE) revert SelfDelegationTooMuch();
+        _checkSelfDelegationLimit(0, delegation);
 
         if (consensusAddress == address(0)) revert InvalidConsensusAddress();
         if (
@@ -518,7 +518,7 @@ contract StakeHub is SystemV2, Initializable, Protectable {
 
         if (delegator == operatorAddress) {
             uint256 currentSelfStake = IStakeCredit(valInfo.creditContract).getPooledBNB(operatorAddress);
-            if (currentSelfStake + bnbAmount > MAX_SELF_DELEGATION_PULSE) revert SelfDelegationTooMuch();
+            _checkSelfDelegationLimit(currentSelfStake, bnbAmount);
         }
 
         uint256 shares = IStakeCredit(valInfo.creditContract).delegate{ value: bnbAmount }(delegator);
@@ -1239,6 +1239,10 @@ contract StakeHub is SystemV2, Initializable, Protectable {
         emit StakeCreditInitialized(operatorAddress, creditProxy);
 
         return creditProxy;
+    }
+
+    function _checkSelfDelegationLimit(uint256 currentSelfStake, uint256 additionalSelfStake) internal pure {
+        if (currentSelfStake + additionalSelfStake > MAX_SELF_DELEGATION_PULSE) revert SelfDelegationTooMuch();
     }
 
     function _checkValidatorSelfDelegation(
