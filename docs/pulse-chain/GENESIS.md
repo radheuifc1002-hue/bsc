@@ -45,6 +45,9 @@ networking requirement establishes otherwise.
   period's opening rate to 95% of that rate.
 - Each new period opens at 95% of the previous period's opening rate. Thus the
   opening rate after 12 months is 95% of the opening rate after six months.
+- For period index `k` and elapsed fraction `x` within that period, the rate is
+  `r(k,x) = r0 × 0.95^k × (1 − 0.05x)`, where `0 ≤ x ≤ 1`. The initial rate
+  `r0` is normalized so the full 128-year integral equals exactly 110m PULSE.
 - Emission is time-based and calculated from the difference between cumulative
   emission targets at the parent and current millisecond timestamps. Parlia's
   millisecond timestamp extension is used, not the whole-second header field.
