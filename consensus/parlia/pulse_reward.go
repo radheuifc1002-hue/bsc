@@ -108,17 +108,18 @@ func (curve *pulseRewardCurve) rewardForInterval(genesisTime, parentTime, blockT
 	if to <= from {
 		return new(big.Int)
 	}
-	// Release all remaining dust at the exact end of the 128-year schedule.
-	if to == pulseRewardDurationSeconds && from < pulseRewardDurationSeconds {
-		return reserveBalance.ToBig()
-	}
-
-	deltaWeight := new(big.Int).Sub(curve.weightAt(to), curve.weightAt(from))
-	if deltaWeight.Sign() <= 0 {
+	// Difference two cumulative targets rather than flooring each block's
+	// standalone share. This makes all contiguous intervals telescope exactly
+	// to the 110m reserve, while keeping any accidental excess reserve deposits
+	// outside the scheduled emission.
+	fromTarget := new(big.Int).Mul(curve.reserveWei, curve.weightAt(from))
+	fromTarget.Div(fromTarget, curve.totalWeight)
+	toTarget := new(big.Int).Mul(curve.reserveWei, curve.weightAt(to))
+	toTarget.Div(toTarget, curve.totalWeight)
+	reward := new(big.Int).Sub(toTarget, fromTarget)
+	if reward.Sign() <= 0 {
 		return new(big.Int)
 	}
-	reward := new(big.Int).Mul(curve.reserveWei, deltaWeight)
-	reward.Div(reward, curve.totalWeight)
 	if reward.Cmp(reserveBalance.ToBig()) > 0 {
 		return reserveBalance.ToBig()
 	}
