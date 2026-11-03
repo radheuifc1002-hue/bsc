@@ -26,7 +26,6 @@ const (
 	pulseRewardDurationMilliseconds  = pulseRewardYears * pulseRewardYearMilliseconds
 	pulseRewardPeriods               = int(pulseRewardYears * 2)
 	pulseRewardReserveWholePULSE     = int64(110_000_000)
-	pulseRewardLinearDropNumerator   = int64(1)
 	pulseRewardLinearDropDenominator = int64(20) // 5% over each six-month period
 	pulseRewardPrecision             = int64(36)
 )
@@ -72,12 +71,12 @@ func newPulseRewardCurve() *pulseRewardCurve {
 // weightAt returns the integrated, fixed-point emission weight from genesis
 // through elapsedMilliseconds. Each six-month segment is linear internally and
 // starts 5% below the previous segment's starting rate.
-func (curve *pulseRewardCurve) weightAt(elapsedSeconds uint64) *big.Int {
-	if elapsedSeconds >= pulseRewardDurationMilliseconds {
+func (curve *pulseRewardCurve) weightAt(elapsedMilliseconds uint64) *big.Int {
+	if elapsedMilliseconds >= pulseRewardDurationMilliseconds {
 		return new(big.Int).Set(curve.totalWeight)
 	}
-	period := int(elapsedSeconds / pulseRewardSixMonthSeconds)
-	offset := new(big.Int).SetUint64(elapsedSeconds % pulseRewardSixMonthSeconds)
+	period := int(elapsedMilliseconds / pulseRewardSixMonthMilliseconds)
+	offset := new(big.Int).SetUint64(elapsedMilliseconds % pulseRewardSixMonthMilliseconds)
 
 	weight := new(big.Int).Set(curve.cumulative[period])
 	if offset.Sign() == 0 {
@@ -107,8 +106,8 @@ func (curve *pulseRewardCurve) rewardForInterval(genesisTime, parentTime, blockT
 		if timestamp <= genesisTime {
 			return 0
 		}
-		if timestamp-genesisTime >= pulseRewardDurationSeconds {
-			return pulseRewardDurationSeconds
+		if timestamp-genesisTime >= pulseRewardDurationMilliseconds {
+			return pulseRewardDurationMilliseconds
 		}
 		return timestamp - genesisTime
 	}
