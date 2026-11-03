@@ -6,34 +6,6 @@ import "../contracts/StakeHub.sol";
 interface Vm {
     function prank(address sender) external;
     function expectRevert(bytes4 revertData) external;
-    function testGovernanceMinimumAcceptsConfiguredBounds() external {
-        StakeHub hub = new StakeHub();
-        vm.prank(block.coinbase);
-        hub.initialize();
-
-        vm.prank(address(0x1007));
-        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(200_000 ether)));
-        require(hub.minSelfDelegationBNB() == 200_000 ether, "governance lower bound rejected");
-
-        vm.prank(address(0x1007));
-        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(10_000_000 ether)));
-        require(hub.minSelfDelegationBNB() == 10_000_000 ether, "governance upper bound rejected");
-    }
-
-    function testGovernanceMinimumRejectsValuesOutsideBounds() external {
-        StakeHub hub = new StakeHub();
-        vm.prank(block.coinbase);
-        hub.initialize();
-
-        vm.expectRevert(StakeHub.InvalidValue.selector);
-        vm.prank(address(0x1007));
-        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(199_999 ether)));
-
-        vm.expectRevert(StakeHub.InvalidValue.selector);
-        vm.prank(address(0x1007));
-        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(10_000_001 ether)));
-    }
-
 }
 
 contract StakeHubLimitHarness is StakeHub {
@@ -64,5 +36,33 @@ contract StakeHubPulseLimitsTest {
         StakeHubLimitHarness hub = new StakeHubLimitHarness();
         vm.expectRevert(StakeHub.SelfDelegationTooMuch.selector);
         hub.checkSelfStakeLimit(9_000_000 ether, 1_000_000 ether + 1);
+    }
+
+    function testGovernanceMinimumAcceptsConfiguredBounds() external {
+        StakeHub hub = new StakeHub();
+        vm.prank(block.coinbase);
+        hub.initialize();
+
+        vm.prank(address(0x1007));
+        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(200_000 ether)));
+        require(hub.minSelfDelegationBNB() == 200_000 ether, "governance lower bound rejected");
+
+        vm.prank(address(0x1007));
+        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(10_000_000 ether)));
+        require(hub.minSelfDelegationBNB() == 10_000_000 ether, "governance upper bound rejected");
+    }
+
+    function testGovernanceMinimumRejectsValuesOutsideBounds() external {
+        StakeHub hub = new StakeHub();
+        vm.prank(block.coinbase);
+        hub.initialize();
+
+        vm.expectRevert(StakeHub.InvalidValue.selector);
+        vm.prank(address(0x1007));
+        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(199_999 ether)));
+
+        vm.expectRevert(StakeHub.InvalidValue.selector);
+        vm.prank(address(0x1007));
+        hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(10_000_001 ether)));
     }
 }
