@@ -5,6 +5,10 @@ on:
     branches: ["pulse-chain/phase-0-foundation"]
     paths:
       - "pulse-contracts/**"
+      - "core/systemcontracts/**"
+      - "params/**"
+      - "go.mod"
+      - "go.sum"
       - ".github/workflows/pulse-contracts.yml"
   pull_request:
     paths:
