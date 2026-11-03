@@ -47,12 +47,13 @@ networking requirement establishes otherwise.
   opening rate after 12 months is 95% of the opening rate after six months.
 - Emission is time-based and calculated from the difference between cumulative
   emission targets at the parent and current millisecond timestamps. Parlia's
-  millisecond timestamp extension is used, not the whole-second header field. This avoids
-  depending on a hard-coded block interval and remains deterministic across
+  millisecond timestamp extension is used, not the whole-second header field.
+  This avoids depending on a hard-coded block interval and remains deterministic across
   Parlia block-time changes.
 - Fixed-point arithmetic uses 36 decimal places; no floating-point operations
-  are used in consensus execution. Per-block integer rounding dust is released
-  with the final reserve remainder at the 128-year boundary.
+  are used in consensus execution. Rewards are calculated as differences
+  between cumulative targets, avoiding per-block rounding drift; the final
+  interval releases the exact remaining scheduled reserve at the 128-year boundary.
 - Rewards are paid to the block producer through the existing BSC-derived
   `ValidatorContract.deposit` path, preserving the validator/delegator reward
   accounting model. Transaction-fee distribution remains separate.
