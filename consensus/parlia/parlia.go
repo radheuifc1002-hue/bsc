@@ -1580,9 +1580,6 @@ func (p *Parlia) finalizeAndAssemble(chain consensus.ChainHeaderReader, header *
 			return nil, nil, errors.New("init contract failed")
 		}
 	}
-	if err := p.distributePulseBlockReward(chain, parent, state, header, cx, &body.Transactions, &receipts, nil, &header.GasUsed, mode, tracer); err != nil {
-		return nil, nil, err
-	}
 	if header.Difficulty.Cmp(diffInTurn) != 0 {
 		number := header.Number.Uint64()
 		snap, err := p.snapshot(chain, number-1, header.ParentHash, nil)
@@ -1609,6 +1606,9 @@ func (p *Parlia) finalizeAndAssemble(chain consensus.ChainHeaderReader, header *
 		}
 	}
 
+	if err := p.distributePulseBlockReward(chain, parent, state, header, cx, &body.Transactions, &receipts, nil, &header.GasUsed, mode, tracer); err != nil {
+		return nil, nil, err
+	}
 	err := p.distributeIncoming(header.Coinbase, state, header, cx, &body.Transactions, &receipts, nil, &header.GasUsed, mode, tracer)
 	if err != nil {
 		return nil, nil, err
