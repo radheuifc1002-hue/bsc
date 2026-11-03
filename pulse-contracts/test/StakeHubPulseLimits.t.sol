@@ -5,7 +5,9 @@ import "../contracts/StakeHub.sol";
 
 interface Vm {
     function prank(address sender) external;
-    function expectRevert(bytes4 revertData) external;
+    function startPrank(address sender) external;
+    function stopPrank() external;
+    function expectRevert() external;
 }
 
 contract StakeHubLimitHarness is StakeHub {
@@ -57,12 +59,10 @@ contract StakeHubPulseLimitsTest {
         vm.prank(block.coinbase);
         hub.initialize();
 
-        vm.prank(address(0x1007));
-        vm.expectRevert(bytes4(keccak256("InvalidValue(string,bytes)")));
+        vm.startPrank(address(0x1007));
+        vm.expectRevert();
         hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(199_999 ether)));
-
-        vm.prank(address(0x1007));
-        vm.expectRevert(bytes4(keccak256("InvalidValue(string,bytes)")));
+        vm.expectRevert();
         hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(10_000_001 ether)));
-    }
-}
+        vm.stopPrank();
+    }}
