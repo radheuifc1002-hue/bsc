@@ -40,13 +40,14 @@ networking requirement establishes otherwise.
 - The 110,000,000 PULSE reserve is a fixed genesis allocation, not newly minted
   supply. No reward can be paid beyond the remaining reserve balance.
 - Duration: 128 Julian years (365.25 days/year), or 4,039,372,800 seconds.
-- Reduction period: 182.625 days (15,778,800 seconds).
+- Reduction period: 182.625 days (15,778,800,000 milliseconds).
 - Within each six-month period, the reward rate declines linearly from the
   period's opening rate to 95% of that rate.
 - Each new period opens at 95% of the previous period's opening rate. Thus the
   opening rate after 12 months is 95% of the opening rate after six months.
 - Emission is time-based and calculated from the difference between cumulative
-  emission targets at the parent and current block timestamps. This avoids
+  emission targets at the parent and current millisecond timestamps. Parlia's
+  millisecond timestamp extension is used, not the whole-second header field. This avoids
   depending on a hard-coded block interval and remains deterministic across
   Parlia block-time changes.
 - Fixed-point arithmetic uses 36 decimal places; no floating-point operations
