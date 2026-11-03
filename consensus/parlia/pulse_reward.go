@@ -144,6 +144,9 @@ func (p *Parlia) distributePulseBlockReward(chain consensus.ChainHeaderReader, p
 	}
 	reserveAddress := common.HexToAddress(systemcontracts.PulseBlockRewardReserve)
 	reserveBalance := state.GetBalance(reserveAddress)
+	if header.Number.Cmp(common.Big1) == 0 && reserveBalance.ToBig().Cmp(pulseEmissionCurve.reserveWei) < 0 {
+		return fmt.Errorf("PULSE genesis reward reserve underfunded: have %s wei, require %s wei", reserveBalance.ToBig(), pulseEmissionCurve.reserveWei)
+	}
 	blockReward := pulseEmissionCurve.rewardForInterval(genesis.MilliTimestamp(), parent.MilliTimestamp(), header.MilliTimestamp(), reserveBalance)
 	if blockReward.Sign() == 0 {
 		return nil
