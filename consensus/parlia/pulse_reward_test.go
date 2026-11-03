@@ -50,14 +50,14 @@ func TestPulseRewardReserveFullyEmitsAt128Years(t *testing.T) {
 	}
 }
 
-func TestPulseRewardRoundingDustIsReleasedAtEnd(t *testing.T) {
+func TestPulseRewardCumulativeTargetsConserveReserveAcrossGaps(t *testing.T) {
 	curve := newPulseRewardCurve()
 	reserve := uint256.MustFromBig(curve.reserveWei)
 	start := uint64(1_800_000_000)
 	first := curve.rewardForInterval(start, start, start+pulseRewardSixMonthSeconds, reserve)
 	remaining := new(big.Int).Sub(curve.reserveWei, first)
 	remainingU256 := uint256.MustFromBig(remaining)
-	last := curve.rewardForInterval(start, start+pulseRewardDurationSeconds-pulseRewardSixMonthSeconds, start+pulseRewardDurationSeconds, remainingU256)
+	last := curve.rewardForInterval(start, start+pulseRewardSixMonthSeconds, start+pulseRewardDurationSeconds, remainingU256)
 	total := new(big.Int).Add(first, last)
 	if total.Cmp(curve.reserveWei) != 0 {
 		t.Fatalf("emission conservation failed: got %s want %s", total, curve.reserveWei)
