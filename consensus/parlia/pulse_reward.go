@@ -12,8 +12,9 @@ import (
 // change across protocol forks or blocks are delayed.
 const (
 	pulseRewardYears                 = uint64(128)
-	pulseRewardSixMonthSeconds       = uint64(182.625 * 24 * 60 * 60)
-	pulseRewardDurationSeconds       = pulseRewardYears * 365.25 * 24 * 60 * 60
+	pulseRewardYearSeconds           = uint64(31_557_600) // Julian year: 365.25 days
+	pulseRewardSixMonthSeconds       = pulseRewardYearSeconds / 2
+	pulseRewardDurationSeconds       = pulseRewardYears * pulseRewardYearSeconds
 	pulseRewardPeriods               = int(pulseRewardYears * 2)
 	pulseRewardReserveWholePULSE     = int64(110_000_000)
 	pulseRewardLinearDropNumerator   = int64(1)
