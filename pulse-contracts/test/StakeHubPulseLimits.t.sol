@@ -57,7 +57,7 @@ contract StakeHubPulseLimitsTest {
         vm.prank(block.coinbase);
         hub.initialize();
 
-        vm.expectRevert(StakeHub.InvalidValue.selector);
+        vm.expectRevert(bytes4(keccak256("InvalidValue(string,bytes)")));
         vm.prank(address(0x1007));
         hub.updateParam("minSelfDelegationBNB", abi.encode(uint256(199_999 ether)));
 
