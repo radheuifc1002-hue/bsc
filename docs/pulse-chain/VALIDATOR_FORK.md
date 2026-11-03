@@ -16,10 +16,10 @@ currently defines these initialization values:
 | `redelegateFeeRate` | 2 |
 
 Its governance parameter update path also constrains
-`minSelfDelegationBNB` to a range of 1,000–100,000 BNB. Therefore changing
-only the initialization default is not sufficient for PULSE CHAIN's requested
-1,000,000 PULSE minimum: the governance validation bound must also be reviewed
-and updated, otherwise the intended value cannot be set through that path.
+`minSelfDelegationBNB` to a range of 1,000–100,000 native-token units (in the
+upstream BNB deployment, these units are BNB). PULSE CHAIN must replace that
+range with PULSE-denominated bounds that include 1,000,000 PULSE; otherwise
+the intended threshold cannot be maintained through the governance path.
 
 ## Exact upstream revision and build settings
 
