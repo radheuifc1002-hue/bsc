@@ -21,7 +21,22 @@ only the initialization default is not sufficient for PULSE CHAIN's requested
 1,000,000 PULSE minimum: the governance validation bound must also be reviewed
 and updated, otherwise the intended value cannot be set through that path.
 
-Source reference: https://github.com/bnb-chain/bsc-genesis-contract/blob/master/contracts/StakeHub.sol
+## Exact upstream revision and build settings
+
+The BSC client pins the Fermi StakeHub artifact to source commit
+`34618f607f8356cf147dde6a69fae150bd53d5bf` and the Pasteur StakeHub artifact
+to source commit `041881a02475638b19f3d840871b7621cdebd8f8`, as recorded in
+`core/systemcontracts/upgrade.go`.
+
+The pinned Pasteur source uses Solidity `0.8.17`. Its
+`foundry.toml` specifies optimizer enabled, 200 optimizer runs, and
+`bytecode_hash = "none"`; the project uses auto-detected solc. The exact
+dependency lock state and full compiler/build reproducibility still need to be
+captured before producing a PULSE artifact.
+
+- Fermi source: https://github.com/bnb-chain/bsc-genesis-contract/commit/34618f607f8356cf147dde6a69fae150bd53d5bf
+- Pasteur source: https://github.com/bnb-chain/bsc-genesis-contract/commit/041881a02475638b19f3d840871b7621cdebd8f8
+- StakeHub source at Pasteur: https://github.com/bnb-chain/bsc-genesis-contract/blob/041881a02475638b19f3d840871b7621cdebd8f8/contracts/StakeHub.sol
 
 ## PULSE CHAIN requirement
 
