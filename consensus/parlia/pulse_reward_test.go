@@ -26,9 +26,9 @@ func TestPulseRewardCurveSixMonthReduction(t *testing.T) {
 
 func TestPulseRewardDeclinesLinearlyWithinSixMonths(t *testing.T) {
 	curve := newPulseRewardCurve()
-	half := pulseRewardSixMonthSeconds / 2
+	half := pulseRewardSixMonthMilliseconds / 2
 	got := curve.weightAt(half)
-	d := new(big.Int).SetUint64(pulseRewardSixMonthSeconds)
+	d := new(big.Int).SetUint64(pulseRewardSixMonthMilliseconds)
 	x := new(big.Int).SetUint64(half)
 	numerator := new(big.Int).Mul(new(big.Int).Mul(big.NewInt(40), d), x)
 	numerator.Sub(numerator, new(big.Int).Mul(x, x))
@@ -43,8 +43,8 @@ func TestPulseRewardDeclinesLinearlyWithinSixMonths(t *testing.T) {
 func TestPulseRewardReserveFullyEmitsAt128Years(t *testing.T) {
 	curve := newPulseRewardCurve()
 	reserve := uint256.MustFromBig(curve.reserveWei)
-	start := uint64(1_800_000_000)
-	got := curve.rewardForInterval(start, start, start+pulseRewardDurationSeconds, reserve)
+	start := uint64(1_800_000_000_000)
+	got := curve.rewardForInterval(start, start, start+pulseRewardDurationMilliseconds, reserve)
 	if got.Cmp(curve.reserveWei) != 0 {
 		t.Fatalf("128-year emission did not release full reserve: got %s want %s", got, curve.reserveWei)
 	}
@@ -54,10 +54,10 @@ func TestPulseRewardCumulativeTargetsConserveReserveAcrossGaps(t *testing.T) {
 	curve := newPulseRewardCurve()
 	reserve := uint256.MustFromBig(curve.reserveWei)
 	start := uint64(1_800_000_000)
-	first := curve.rewardForInterval(start, start, start+pulseRewardSixMonthSeconds, reserve)
+	first := curve.rewardForInterval(start, start, start+pulseRewardSixMonthMilliseconds, reserve)
 	remaining := new(big.Int).Sub(curve.reserveWei, first)
 	remainingU256 := uint256.MustFromBig(remaining)
-	last := curve.rewardForInterval(start, start+pulseRewardSixMonthSeconds, start+pulseRewardDurationSeconds, remainingU256)
+	last := curve.rewardForInterval(start, start+pulseRewardSixMonthMilliseconds, start+pulseRewardDurationMilliseconds, remainingU256)
 	total := new(big.Int).Add(first, last)
 	if total.Cmp(curve.reserveWei) != 0 {
 		t.Fatalf("emission conservation failed: got %s want %s", total, curve.reserveWei)
