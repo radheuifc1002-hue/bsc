@@ -12,7 +12,7 @@ on:
       - ".github/workflows/pulse-contracts.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   foundry:
@@ -39,6 +39,19 @@ jobs:
       - name: Export StakeHub runtime bytecode
         working-directory: pulse-contracts
         run: forge inspect StakeHub deployedBytecode > out/StakeHub.deployed-bytecode.txt
+      - name: Commit generated PULSE StakeHub runtime
+        working-directory: pulse-contracts
+        run: |
+          mkdir -p ../core/systemcontracts/pulse
+          cp out/StakeHub.deployed-bytecode.txt ../core/systemcontracts/pulse/StakeHubContract
+          cd ..
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add core/systemcontracts/pulse/StakeHubContract
+          if ! git diff --cached --quiet; then
+            git commit -m "build(pulse): update compiled StakeHub runtime"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
       - name: Upload compiled contract artifact
         uses: actions/upload-artifact@v4
         with:
