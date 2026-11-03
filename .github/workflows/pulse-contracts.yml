@@ -1,0 +1,38 @@
+name: PULSE system contracts
+
+on:
+  push:
+    branches: ["pulse-chain/phase-0-foundation"]
+    paths:
+      - "pulse-contracts/**"
+      - ".github/workflows/pulse-contracts.yml"
+  pull_request:
+    paths:
+      - "pulse-contracts/**"
+      - ".github/workflows/pulse-contracts.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  foundry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: pulse-contracts/package-lock.json
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
+      - name: Install pinned Solidity dependencies
+        working-directory: pulse-contracts
+        run: npm ci
+      - name: Build system contracts
+        working-directory: pulse-contracts
+        run: forge build
+      - name: Run StakeHub initialization tests
+        working-directory: pulse-contracts
+        run: forge test -vvv
