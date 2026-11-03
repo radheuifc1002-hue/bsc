@@ -43,18 +43,16 @@ forge build
 forge test -vvv
 ```
 
-The GitHub Actions workflow runs these commands on changes to this directory.
-No compiled PULSE artifact is accepted until this build and tests pass and the
-resulting deployed bytecode is compared against the intended system-contract
-artifact format used by the BSC client.
+The GitHub Actions workflow runs the build and tests, exports the runtime as
+raw hexadecimal, commits it to `core/systemcontracts/pulse/StakeHubContract`,
+and runs Go tests for the PULSE system-contract routing.
 
 ## Deployment status
 
-This source fork is not yet wired into the BSC client's versioned system
-contract artifact registry, genesis allocation, or upgrade manifest. Do not
-ship it as a live chain artifact yet. A matching StakeHub bytecode artifact,
-constructor/initializer state, genesis deployment, and end-to-end staking tests
-are still required.
+The runtime is embedded in the BSC client and selected by the PULSE-specific
+Pasteur upgrade map. It is not yet installed into a finalized fresh-network
+genesis allocation or validated on a running multi-validator PULSE testnet.
+Genesis storage initialization and end-to-end staking tests remain required.
 
 The upstream contract files retain their original SPDX headers. The upstream
 license notice is included in this directory.
