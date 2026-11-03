@@ -16,9 +16,9 @@ currently defines these initialization values:
 | `redelegateFeeRate` | 2 |
 
 Its governance parameter update path also constrains
-`minSelfDelegationBNB` to a range of 1,000–100,000 native-token units (in the
+`minSelfDelegationBNB` to a range of 200,000–2,000,000 PULSE (in the
 upstream BNB deployment, these units are BNB). PULSE CHAIN must replace that
-range with PULSE-denominated bounds that include 1,000,000 PULSE; otherwise
+range with PULSE-denominated bounds that include 200,000 PULSE; otherwise
 the intended threshold cannot be maintained through the governance path.
 
 ## Exact upstream revision and build settings
@@ -40,8 +40,11 @@ captured before producing a PULSE artifact.
 
 ## PULSE CHAIN requirement
 
-- Set the minimum self-delegation/validator eligibility threshold to
-  1,000,000 PULSE (18-decimal base units in the EVM contract).
+- Initialize the minimum self-delegation/validator eligibility threshold to
+  200,000 PULSE (18-decimal base units in the EVM contract).
+- Constrain governance updates of this minimum to 200,000–2,000,000 PULSE.
+  The 2,000,000 PULSE value is the maximum configurable minimum threshold,
+  not a cap on the amount an individual validator may self-delegate.
 - Keep the elected-validator capacity at the upstream value of 45.
 - Preserve the remaining upstream staking and validator behavior unless a
   separate, explicitly approved change requires otherwise.
@@ -55,8 +58,8 @@ captured before producing a PULSE artifact.
    the selected BSC source revision.
 2. Vendor or fork the exact Solidity source and its build configuration with
    license notices intact.
-3. Change the minimum self-delegation default to 1,000,000 PULSE and update the
-   governance parameter validation range so it accepts the intended value.
+3. Change the minimum self-delegation default to 200,000 PULSE and update the
+   governance parameter validation range so it accepts the 200,000–2,000,000 PULSE governance range.
 4. Preserve the 45 elected-validator capacity and all unrelated parameters.
 5. Rebuild the affected system-contract bytecode using the pinned compiler and
    settings; record compiler version, optimizer settings, metadata settings,
