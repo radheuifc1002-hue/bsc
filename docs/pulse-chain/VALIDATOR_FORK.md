@@ -1,6 +1,6 @@
 # PULSE CHAIN validator-system contract fork notes
 
-Status: source audit in progress — no contract or bytecode changes made.
+Status: PULSE StakeHub Solidity fork implemented; runtime bytecode generated and embedded; Go upgrade routing added. Genesis installation and end-to-end chain validation remain outstanding.
 
 ## Upstream StakeHub findings
 
@@ -26,15 +26,27 @@ The BSC client pins the Fermi StakeHub artifact to source commit
 to source commit `041881a02475638b19f3d840871b7621cdebd8f8`, as recorded in
 `core/systemcontracts/upgrade.go`.
 
-The pinned Pasteur source uses Solidity `0.8.17`. Its
-`foundry.toml` specifies optimizer enabled, 200 optimizer runs, and
-`bytecode_hash = "none"`; the project uses auto-detected solc. The exact
-dependency lock state and full compiler/build reproducibility still need to be
-captured before producing a PULSE artifact.
+The pinned Pasteur source uses Solidity `0.8.17`. PULSE pins Solidity `0.8.17`, optimizer enabled with 200 runs, and `bytecode_hash = "none"`. The upstream package manifest and lockfile are vendored at the pinned revision; OpenZeppelin dependencies are locked.
 
 - Fermi source: https://github.com/bnb-chain/bsc-genesis-contract/commit/34618f607f8356cf147dde6a69fae150bd53d5bf
 - Pasteur source: https://github.com/bnb-chain/bsc-genesis-contract/commit/041881a02475638b19f3d840871b7621cdebd8f8
 - StakeHub source at Pasteur: https://github.com/bnb-chain/bsc-genesis-contract/blob/041881a02475638b19f3d840871b7621cdebd8f8/contracts/StakeHub.sol
+
+## PULSE CHAIN implementation
+
+The fork is under `pulse-contracts/` with the modified StakeHub, its direct
+Solidity dependencies, upstream license notice, Foundry configuration, npm
+lockfile, and focused tests.
+
+The generated runtime is embedded at
+`core/systemcontracts/pulse/StakeHubContract`. The Go client selects the PULSE
+upgrade map by chain ID 676 and substitutes only StakeHub during the Pasteur
+transition. Other Pasteur system contracts remain upstream. The embedded
+runtime is raw hexadecimal without a `0x` prefix, matching the BSC loader.
+
+Foundry build and three tests passed in CI: initialization values, exact-cap
+acceptance, and above-cap rejection. Genesis installation and end-to-end
+validator tests remain outstanding.
 
 ## PULSE CHAIN requirement
 
