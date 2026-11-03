@@ -64,27 +64,21 @@ validator tests remain outstanding.
   `maxElectedValidators`; the elected candidate pool and active consensus
   producer set are distinct protocol concepts and must be traced separately.
 
-## Required implementation procedure
+## Remaining implementation work
 
-1. Pin the exact upstream `bsc-genesis-contract` source revision that matches
-   the selected BSC source revision.
-2. Vendor or fork the exact Solidity source and its build configuration with
-   license notices intact.
-3. Change the minimum self-delegation default to 200,000 PULSE; set a separately
-   enforced 10,000,000 PULSE maximum on validator self-delegation; and update
-   governance validation so the minimum threshold cannot be set below
-   200,000 PULSE.
-4. Preserve the 45 elected-validator capacity and all unrelated parameters; enforce the self-stake cap on validator creation, direct self-delegation, and self-redelegation without capping third-party delegations.
-5. Rebuild the affected system-contract bytecode using the pinned compiler and
-   settings; record compiler version, optimizer settings, metadata settings,
-   source hashes, and resulting bytecode hashes.
-6. Update the matching versioned StakeHub artifact(s) and any genesis storage
-   initialization paths. Do not patch hex bytecode by search-and-replace.
-7. Verify the deployed runtime bytecode, initialization storage, parameter
-   getters, validator election behavior, and governance updates on a local
-   testnet before using it in a public testnet genesis.
+1. Add the PULSE StakeHub runtime and storage initialization to the fresh-network
+   genesis state. The Pasteur upgrade route is not a substitute for genesis
+   predeployment.
+2. Confirm the correct first-block/fork activation behavior for a new chain;
+   the current PULSE chain config still inherits the provisional BSC schedule.
+3. Add integration tests for validator creation, direct self-delegation,
+   self-redelegation, third-party delegation, governance parameter bounds,
+   jailing below the minimum, and election ranking.
+4. Run the Go client tests and a local multi-validator PULSE testnet, including
+   state migration and upgrade checks. Solidity unit tests are not
+   end-to-end validator tests.
+5. Record reproducible source/runtime hashes and compare the runtime embedded
+   in Go with the generated Foundry output.
 
-The BSC fork repository currently carries versioned system-contract bytecode
-artifacts under `core/systemcontracts`, but not the Solidity source tree.
-The artifact versions and source revision must be matched before modifying any
-artifact. No contract artifact has been changed in this phase.
+The PULSE-specific runtime is now a committed artifact; it is not yet installed
+into a finalized genesis state or validated on a running chain.
