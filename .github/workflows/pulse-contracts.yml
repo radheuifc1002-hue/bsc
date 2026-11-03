@@ -7,6 +7,7 @@ on:
       - "pulse-contracts/**"
       - "core/systemcontracts/**"
       - "params/**"
+      - "consensus/parlia/**"
       - "go.mod"
       - "go.sum"
       - ".github/workflows/pulse-contracts.yml"
@@ -60,8 +61,8 @@ jobs:
         with:
           go-version-file: go.mod
           cache: true
-      - name: Compile PULSE system-contract integration
-        run: go test ./params ./core/systemcontracts/...
+      - name: Compile PULSE consensus and system-contract integration
+        run: go test ./params ./core/systemcontracts/... ./consensus/parlia
       - name: Upload compiled contract artifact
         uses: actions/upload-artifact@v4
         with:
