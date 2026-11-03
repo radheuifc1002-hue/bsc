@@ -59,7 +59,7 @@ networking requirement establishes otherwise.
 
 The normalized initial rate is approximately 0.357507340554887517 PULSE per
 second. At a 750 ms block interval this corresponds to approximately
-0.268130505416165637 PULSE for the first block; actual per-block amounts follow
+0.268130505097545275 PULSE for the first block; actual per-block amounts follow
 the block's timestamp interval. The exact consensus constants and fixed-point
 curve are implemented in `consensus/parlia/pulse_reward.go`.
 
