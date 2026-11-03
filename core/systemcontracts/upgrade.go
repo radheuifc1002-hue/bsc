@@ -1120,7 +1120,7 @@ func init() {
 		Configs: []*UpgradeConfig{
 			{
 				ContractAddr: common.HexToAddress(StakeHubContract),
-				CommitUrl:    "https://github.com/radheuifc1002-hue/bsc/tree/pulse-chain/phase-0-foundation/pulse-contracts",
+				CommitUrl:    "https://github.com/radheuifc1002-hue/bsc/commit/1bc252615ebbb1619b3e39d1e0c0a1a080b7b903",
 				Code:         pulseContracts.StakeHubContract,
 			},
 		},
