@@ -17,7 +17,7 @@ currently defines these initialization values:
 
 Its governance parameter update path constrains `minSelfDelegationBNB`.
 The upstream BNB deployment expresses the value in BNB; PULSE CHAIN must use
-PULSE-denominated bounds of 200,000–2,000,000 PULSE.
+PULSE-denominated bounds that include the selected 200,000 PULSE minimum.
 
 ## Exact upstream revision and build settings
 
@@ -40,7 +40,7 @@ captured before producing a PULSE artifact.
 
 - Initialize the minimum self-delegation/validator eligibility threshold to
   200,000 PULSE (18-decimal base units in the EVM contract).
-- Constrain governance updates of this minimum to 200,000–2,000,000 PULSE.
+- Constrain governance updates of this minimum to 200,000–10,000,000 PULSE.
   The 2,000,000 PULSE value is the maximum configurable minimum threshold,
   not a cap on the amount an individual validator may self-delegate.
 - Keep the elected-validator capacity at the upstream value of 45.
@@ -56,9 +56,11 @@ captured before producing a PULSE artifact.
    the selected BSC source revision.
 2. Vendor or fork the exact Solidity source and its build configuration with
    license notices intact.
-3. Change the minimum self-delegation default to 200,000 PULSE and update the
-   governance parameter validation range to 200,000–2,000,000 PULSE.
-4. Preserve the 45 elected-validator capacity and all unrelated parameters.
+3. Change the minimum self-delegation default to 200,000 PULSE; set a separately
+   enforced 10,000,000 PULSE maximum on validator self-delegation; and update
+   governance validation so the minimum threshold cannot be set below
+   200,000 PULSE.
+4. Preserve the 45 elected-validator capacity and all unrelated parameters; enforce the self-stake cap on validator creation, direct self-delegation, and self-redelegation without capping third-party delegations.
 5. Rebuild the affected system-contract bytecode using the pinned compiler and
    settings; record compiler version, optimizer settings, metadata settings,
    source hashes, and resulting bytecode hashes.
