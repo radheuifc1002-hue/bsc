@@ -43,7 +43,8 @@ illustrative reward rate is a genesis parameter.
 ## Consensus and validator constraints
 
 - Preserve the upstream BSC Parlia consensus and validator-election design.
-- Minimum validator self-stake target: 1,000,000 PULSE.
+- Minimum validator self-stake target: 200,000 PULSE.
+- Maximum validator self-stake: 10,000,000 PULSE per validator.
 - The minimum self-stake is an eligibility threshold, not a guarantee of
   election.
 - Do not alter validator counts, election cadence, delegation, commission,
@@ -58,9 +59,11 @@ illustrative reward rate is a genesis parameter.
   addresses, self-stake funding, and the initial validator set encoded in
   Parlia genesis extra-data.
 
-The 1,000,000 PULSE threshold must be implemented in the applicable staking
-system-contract source and its compiled/deployed bytecode. A Go-only constant
-change is insufficient if the contract enforces the threshold.
+Both limits must be enforced in the applicable staking system-contract source
+and its compiled/deployed bytecode. The 10,000,000 PULSE limit applies only to
+the validator operator's own self-delegation, not to third-party delegations or
+the total stake attracted by that validator. A Go-only constant change is
+insufficient if the contract enforces these limits.
 
 ## EVM fork schedule
 
