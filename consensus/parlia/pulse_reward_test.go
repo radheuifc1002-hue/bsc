@@ -9,9 +9,6 @@ import (
 
 func TestPulseRewardCurveSixMonthReduction(t *testing.T) {
 	curve := newPulseRewardCurve()
-	if curve.powers[1].Cmp(new(big.Int).Mul(curve.powers[0], big.NewInt(19))) >= 0 {
-		t.Fatal("first six-month rate did not reduce")
-	}
 	wantFirst := new(big.Int).Mul(curve.powers[0], big.NewInt(19))
 	wantFirst.Div(wantFirst, big.NewInt(20))
 	if curve.powers[1].Cmp(wantFirst) != 0 {
@@ -53,7 +50,7 @@ func TestPulseRewardReserveFullyEmitsAt128Years(t *testing.T) {
 func TestPulseRewardCumulativeTargetsConserveReserveAcrossGaps(t *testing.T) {
 	curve := newPulseRewardCurve()
 	reserve := uint256.MustFromBig(curve.reserveWei)
-	start := uint64(1_800_000_000)
+	start := uint64(1_800_000_000_000)
 	first := curve.rewardForInterval(start, start, start+pulseRewardSixMonthMilliseconds, reserve)
 	remaining := new(big.Int).Sub(curve.reserveWei, first)
 	remainingU256 := uint256.MustFromBig(remaining)
@@ -73,5 +70,16 @@ func TestPulseRewardDoesNotEmitBeforeGenesisOrAfterReserveEmpty(t *testing.T) {
 	empty := new(uint256.Int)
 	if got := curve.rewardForInterval(100, 100, 101, empty); got.Sign() != 0 {
 		t.Fatalf("emitted with empty reserve: %s", got)
+	}
+}
+
+func TestPulseRewardUsesMillisecondsForBlockIntervals(t *testing.T) {
+	curve := newPulseRewardCurve()
+	reserve := uint256.MustFromBig(curve.reserveWei)
+	start := uint64(1_800_000_000_000)
+	got := curve.rewardForInterval(start, start, start+750, reserve)
+	want := big.NewInt(268130505097545275) // wei, first 750 ms interval
+	if got.Cmp(want) != 0 {
+		t.Fatalf("750ms initial reward mismatch: got %s want %s", got, want)
 	}
 }
