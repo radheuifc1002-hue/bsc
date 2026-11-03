@@ -1461,7 +1461,7 @@ func (p *Parlia) Finalize(chain consensus.ChainHeaderReader, header *types.Heade
 		}
 	}
 
-	// No block rewards in PoA, so the state remains as is and uncles are dropped
+	// BSC PoA has no native block subsidy; PULSE separately releases its capped genesis reserve. Uncles are dropped.
 	if header.Number.Cmp(common.Big1) == 0 {
 		err := p.initContract(state, header, cx, txs, receipts, systemTxs, usedGas, systemTxImporting, tracer)
 		if err != nil {
