@@ -49,8 +49,11 @@ illustrative reward rate is a genesis parameter.
 - Do not alter validator counts, election cadence, delegation, commission,
   slashing, jailing, unbonding, reward, or governance rules as part of this
   threshold change.
-- The exact active/candidate set structure must be confirmed from the
-  versioned upstream system-contract source and matching deployed bytecode.
+- Upstream StakeHub currently sets `maxElectedValidators` to 45; preserve that
+  elected-candidate capacity. Do not conflate it with the active Parlia
+  block-producer set.
+- The exact active producer selection and validator-set behavior must still
+  be traced through the versioned validator system contract and Parlia code.
 - A production genesis requires initial validator consensus keys, operator
   addresses, self-stake funding, and the initial validator set encoded in
   Parlia genesis extra-data.
