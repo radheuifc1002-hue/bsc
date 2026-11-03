@@ -52,6 +52,12 @@ jobs:
             git commit -m "build(pulse): update compiled StakeHub runtime"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Compile PULSE system-contract integration
+        run: go test ./params ./core/systemcontracts/...
       - name: Upload compiled contract artifact
         uses: actions/upload-artifact@v4
         with:
