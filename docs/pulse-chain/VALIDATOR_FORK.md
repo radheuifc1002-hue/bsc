@@ -15,11 +15,9 @@ currently defines these initialization values:
 | `unbondPeriod` | 7 days |
 | `redelegateFeeRate` | 2 |
 
-Its governance parameter update path also constrains
-`minSelfDelegationBNB` to a range of 200,000–2,000,000 PULSE (in the
-upstream BNB deployment, these units are BNB). PULSE CHAIN must replace that
-range with PULSE-denominated bounds that include 200,000 PULSE; otherwise
-the intended threshold cannot be maintained through the governance path.
+Its governance parameter update path constrains `minSelfDelegationBNB`.
+The upstream BNB deployment expresses the value in BNB; PULSE CHAIN must use
+PULSE-denominated bounds of 200,000–2,000,000 PULSE.
 
 ## Exact upstream revision and build settings
 
@@ -59,7 +57,7 @@ captured before producing a PULSE artifact.
 2. Vendor or fork the exact Solidity source and its build configuration with
    license notices intact.
 3. Change the minimum self-delegation default to 200,000 PULSE and update the
-   governance parameter validation range so it accepts the 200,000–2,000,000 PULSE governance range.
+   governance parameter validation range to 200,000–2,000,000 PULSE.
 4. Preserve the 45 elected-validator capacity and all unrelated parameters.
 5. Rebuild the affected system-contract bytecode using the pinned compiler and
    settings; record compiler version, optimizer settings, metadata settings,
