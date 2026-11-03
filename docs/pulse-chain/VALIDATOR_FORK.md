@@ -17,7 +17,7 @@ currently defines these initialization values:
 
 Its governance parameter update path constrains `minSelfDelegationBNB`.
 The upstream BNB deployment expresses the value in BNB; PULSE CHAIN must use
-PULSE-denominated bounds that include the selected 200,000 PULSE minimum.
+PULSE-denominated bounds consistent with the PULSE minimum and maximum.
 
 ## Exact upstream revision and build settings
 
@@ -40,9 +40,11 @@ captured before producing a PULSE artifact.
 
 - Initialize the minimum self-delegation/validator eligibility threshold to
   200,000 PULSE (18-decimal base units in the EVM contract).
-- Constrain governance updates of this minimum to 200,000–10,000,000 PULSE.
-  The 2,000,000 PULSE value is the maximum configurable minimum threshold,
-  not a cap on the amount an individual validator may self-delegate.
+- Constrain governance updates of the minimum threshold to 200,000–10,000,000
+  PULSE.
+- Independently enforce a 10,000,000 PULSE cap on each validator's own
+  self-delegated stake. This is a per-validator cap, not a cap on total stake
+  attracted from third-party delegators.
 - Keep the elected-validator capacity at the upstream value of 45.
 - Preserve the remaining upstream staking and validator behavior unless a
   separate, explicitly approved change requires otherwise.
