@@ -151,6 +151,9 @@ func (p *Parlia) distributePulseBlockReward(chain consensus.ChainHeaderReader, p
 	}
 	rewardValue := uint256.MustFromBig(blockReward)
 	state.SetBalance(reserveAddress, new(uint256.Int).Sub(reserveBalance, rewardValue), tracing.BalanceChangeUnspecified)
+	// The existing BSC validator deposit system transaction spends from the
+	// block producer, so credit it with the reserve-funded amount first.
+	state.AddBalance(header.Coinbase, rewardValue, tracing.BalanceChangeUnspecified)
 	if err := p.distributeToValidator(blockReward, header.Coinbase, state, header, cx, txs, receipts, receivedTxs, usedGas, mode, tracer); err != nil {
 		return fmt.Errorf("distribute PULSE block reward: %w", err)
 	}
