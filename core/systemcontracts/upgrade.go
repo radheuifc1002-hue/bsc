@@ -26,6 +26,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/systemcontracts/niels"
 	"github.com/ethereum/go-ethereum/core/systemcontracts/pascal"
 	"github.com/ethereum/go-ethereum/core/systemcontracts/pasteur"
+	pulseContracts "github.com/ethereum/go-ethereum/core/systemcontracts/pulse"
 	"github.com/ethereum/go-ethereum/core/systemcontracts/planck"
 	"github.com/ethereum/go-ethereum/core/systemcontracts/plato"
 	"github.com/ethereum/go-ethereum/core/systemcontracts/ramanujan"
@@ -54,6 +55,7 @@ const (
 	mainNet    = "Mainnet"
 	chapelNet  = "Chapel"
 	rialtoNet  = "Rialto"
+	pulseNet   = "PulseChain"
 	defaultNet = "Default"
 )
 
@@ -1110,6 +1112,20 @@ func init() {
 		},
 	}
 
+	// PULSE CHAIN uses the same Pasteur protocol transition but substitutes
+	// its independently compiled StakeHub. Other Pasteur system contracts stay
+	// on the pinned upstream BSC artifacts.
+	pasteurUpgrade[pulseNet] = &Upgrade{
+		UpgradeName: "pulse-pasteur",
+		Configs: []*UpgradeConfig{
+			{
+				ContractAddr: common.HexToAddress(StakeHubContract),
+				CommitUrl:    "https://github.com/radheuifc1002-hue/bsc/tree/pulse-chain/phase-0-foundation/pulse-contracts",
+				Code:         pulseContracts.StakeHubContract,
+			},
+		},
+	}
+
 	jennerUpgrade[mainNet] = &Upgrade{
 		UpgradeName: "jenner",
 		Configs: []*UpgradeConfig{
@@ -1174,16 +1190,20 @@ func upgradeBuildInSystemContract(config *params.ChainConfig, blockNumber *big.I
 	}
 
 	var network string
-	switch GenesisHash {
-	/* Add mainnet genesis hash */
-	case params.BSCGenesisHash:
-		network = mainNet
-	case params.ChapelGenesisHash:
-		network = chapelNet
-	case params.RialtoGenesisHash:
-		network = rialtoNet
-	default:
-		network = defaultNet
+	if config.ChainID != nil && config.ChainID.Uint64() == params.PulseChainID {
+		network = pulseNet
+	} else {
+		switch GenesisHash {
+		/* Add mainnet genesis hash */
+		case params.BSCGenesisHash:
+			network = mainNet
+		case params.ChapelGenesisHash:
+			network = chapelNet
+		case params.RialtoGenesisHash:
+			network = rialtoNet
+		default:
+			network = defaultNet
+		}
 	}
 
 	logger := log.New("system-contract-upgrade", network)
