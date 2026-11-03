@@ -63,11 +63,11 @@ second. At a 750 ms block interval this corresponds to approximately
 the block's timestamp interval. The exact consensus constants and fixed-point
 curve are implemented in `consensus/parlia/pulse_reward.go`.
 
-The reserve address must be funded with at least 110,000,000 PULSE in the final
-genesis allocation. Parlia rejects block 1 if the reserve is underfunded. The
-reserve balance must be included in the 1.1 billion PULSE supply accounting;
-any excess balance at the reserve address is not part of the scheduled 110m
-emission and is not released by the reward curve.
+The genesis allocation must fund the reserve address with exactly 110,000,000
+PULSE. Parlia rejects block 1 if the reserve is underfunded. The reserve
+balance must be included in the 1.1 billion PULSE supply accounting; any
+additional transfers to the reserve address are not part of the scheduled 110m
+emission and are not released by the reward curve.
 
 ## Consensus and validator constraints
 
