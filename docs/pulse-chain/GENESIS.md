@@ -26,19 +26,45 @@ networking requirement establishes otherwise.
 ## Supply and allocation constraints
 
 - Initial supply: 1,100,000,000 PULSE.
-- Block-reward reserve: 110,000,000 PULSE (10% of initial supply), held in a
-  dedicated, non-spendable-by-ordinary-accounts reserve until released by the
-  consensus reward mechanism.
+- Block-reward reserve: 110,000,000 PULSE (10% of initial supply), funded at
+  genesis at `0x0000000000000000000000000000000000000676`. Ordinary accounts
+  cannot spend this balance; Parlia releases it only through validator rewards.
 - Remaining supply: 990,000,000 PULSE (90%). Final recipient allocations and
   recipient addresses have not yet been supplied.
 - Initial WPULSE liquidity allocation: 50,000,000 PULSE, included within the
   990,000,000 PULSE allocation; it is not additional supply.
 - WPULSE is intended to be redeemable 1:1 for locked native PULSE.
 
-The 128-year reward curve, six-month 5% reductions, exact initial per-block
-emission, rounding policy, and reserve-release implementation must be specified
-and tested before the reserve is placed in a live genesis allocation. No
-illustrative reward rate is a genesis parameter.
+### Block-reward emission (implemented on the feature branch; genesis funding pending)
+
+- The 110,000,000 PULSE reserve is a fixed genesis allocation, not newly minted
+  supply. No reward can be paid beyond the remaining reserve balance.
+- Duration: 128 Julian years (365.25 days/year), or 4,039,372,800 seconds.
+- Reduction period: 182.625 days (15,778,800 seconds).
+- Within each six-month period, the reward rate declines linearly from the
+  period's opening rate to 95% of that rate.
+- Each new period opens at 95% of the previous period's opening rate. Thus the
+  opening rate after 12 months is 95% of the opening rate after six months.
+- Emission is time-based and calculated from the difference between cumulative
+  emission targets at the parent and current block timestamps. This avoids
+  depending on a hard-coded block interval and remains deterministic across
+  Parlia block-time changes.
+- Fixed-point arithmetic uses 36 decimal places; no floating-point operations
+  are used in consensus execution. Per-block integer rounding dust is released
+  with the final reserve remainder at the 128-year boundary.
+- Rewards are paid to the block producer through the existing BSC-derived
+  `ValidatorContract.deposit` path, preserving the validator/delegator reward
+  accounting model. Transaction-fee distribution remains separate.
+
+The normalized initial rate is approximately 0.357507340554887517 PULSE per
+second. At a 750 ms block interval this corresponds to approximately
+0.268130505416165637 PULSE for the first block; actual per-block amounts follow
+the block's timestamp interval. The exact consensus constants and fixed-point
+curve are implemented in `consensus/parlia/pulse_reward.go`.
+
+The reserve address must be funded with exactly 110,000,000 PULSE in the final
+genesis allocation. The chain must not launch with an unfunded reserve, and the
+reserve balance must be included in the 1.1 billion PULSE supply accounting.
 
 ## Consensus and validator constraints
 
