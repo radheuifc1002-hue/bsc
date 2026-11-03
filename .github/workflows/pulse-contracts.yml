@@ -36,3 +36,14 @@ jobs:
       - name: Run StakeHub initialization tests
         working-directory: pulse-contracts
         run: forge test -vvv
+      - name: Export StakeHub runtime bytecode
+        working-directory: pulse-contracts
+        run: forge inspect StakeHub deployedBytecode > out/StakeHub.deployed-bytecode.txt
+      - name: Upload compiled contract artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pulse-stakehub-solc-0.8.17
+          path: |
+            pulse-contracts/out/StakeHub.sol/StakeHub.json
+            pulse-contracts/out/StakeHub.deployed-bytecode.txt
+          if-no-files-found: error
